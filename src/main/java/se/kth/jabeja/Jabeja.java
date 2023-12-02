@@ -28,8 +28,8 @@ public class Jabeja {
     this.round = 0;
     this.numberOfSwaps = 0;
     this.config = config;
-//    this.T = config.getTemperature();
-    this.T=1.0;
+    this.T = config.getTemperature();
+//    this.T=1.0;
   }
 
 
@@ -52,14 +52,14 @@ public class Jabeja {
    */
   private void saCoolDown(){
     // TODO for second task
-//    if (T > 1)
-//      T -= config.getDelta();
-//    if (T < 1)
-//      T = 1;
-    T=T*0.8;
-    if(T<0.00001){
-      T=0.00001;
-    }
+    if (T > 1)
+      T -= config.getDelta();
+    if (T < 1)
+      T = 1;
+//    T=T*0.8;
+//    if(T<0.00001){
+//      T=0.00001;
+//    }
   }
 
   /**
@@ -112,7 +112,8 @@ public class Jabeja {
       int d_pq=getDegree(nodep,q.getColor());
       int d_qp=getDegree(q,nodep.getColor());
       int newV=(int)Math.pow(d_pq,config.getAlpha())+(int)Math.pow(d_qp,config.getAlpha());
-      if((acc_prob(oldV,newV,T)>Math.random()&&newV<oldV)||(newV>oldV&&newV>highestBenefit)){
+      if(newV>highestBenefit&&newV*T>oldV){
+//      if((acc_prob(oldV,newV,T)>Math.random()&&newV<oldV)||(newV>oldV&&newV>highestBenefit)){
         highestBenefit=newV;
         bestPartner=q;
       }
