@@ -43,23 +43,28 @@ public class Jabeja {
       //one cycle for all nodes have completed.
       //reduce the temperature
       saCoolDown();
+      restart(round);
       report();
     }
   }
-
+  private void restart(int round){
+    if(round==400){
+      T=1.0;
+    }
+  }
   /**
    * Simulated analealing cooling function
    */
   private void saCoolDown(){
     // TODO for second task
-    if (T > 1)
-      T -= config.getDelta();
-    if (T < 1)
-      T = 1;
-//    T=T*0.8;
-//    if(T<0.00001){
-//      T=0.00001;
-//    }
+//    if (T > 1)
+//      T -= config.getDelta();
+//    if (T < 1)
+//      T = 1;
+    T=T*0.9;
+    if(T<0.00001){
+      T=0.00001;
+    }
   }
 
   /**
@@ -78,11 +83,13 @@ public class Jabeja {
 
     }
 
-    if (partner==null&&(config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
-            || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM)) {
+    if ((config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID)
+            || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM) {
       // if local policy fails then randomly sample the entire graph
       // TODO done
-      partner=findPartner(nodeId,getSample(nodeId));
+      if(partner==null){
+        partner=findPartner(nodeId,getSample(nodeId));
+      }
     }
 
     // swap the colors
@@ -93,7 +100,6 @@ public class Jabeja {
       partner.setColor(c1);
       numberOfSwaps++;
     }
-    saCoolDown();
   }
 
   public Node findPartner(int nodeId, Integer[] nodes){
@@ -108,12 +114,13 @@ public class Jabeja {
       int d_pp=getDegree(nodep,nodep.getColor());
       Node q=entireGraph.get(node);
       int d_qq=getDegree(q,q.getColor());
-      int oldV=(int)Math.pow(d_pp,config.getAlpha())+(int)Math.pow(d_qq,config.getAlpha());
+      double oldV=Math.pow(d_pp,config.getAlpha())+Math.pow(d_qq,config.getAlpha());
       int d_pq=getDegree(nodep,q.getColor());
       int d_qp=getDegree(q,nodep.getColor());
-      int newV=(int)Math.pow(d_pq,config.getAlpha())+(int)Math.pow(d_qp,config.getAlpha());
-      if(newV>highestBenefit&&newV*T>oldV){
-//      if((acc_prob(oldV,newV,T)>Math.random()&&newV<oldV)||(newV>oldV&&newV>highestBenefit)){
+      double newV=Math.pow(d_pq,config.getAlpha())+Math.pow(d_qp,config.getAlpha());
+//      if(newV>highestBenefit&&newV*T>oldV){
+//      if((exp_acc_prob(oldV,newV,T)>Math.random()&&newV<oldV)||(newV>oldV&&newV>highestBenefit)){
+      if((acc_prob(oldV,newV,T)>Math.random()&&newV<oldV)||(newV>oldV&&newV>highestBenefit)){
         highestBenefit=newV;
         bestPartner=q;
       }
@@ -122,8 +129,11 @@ public class Jabeja {
     return bestPartner;
   }
 
-  private double acc_prob(int oldV,int newV,double T){
+  private double exp_acc_prob(double oldV,double newV,double T){
     return Math.exp((newV-oldV)/T);
+  }
+  private double acc_prob(double oldV,double newV,double T){
+    return 1/(1+Math.exp(-(newV-oldV)/(0.1*T)));
   }
   /**
    * The the degreee on the node based on color
