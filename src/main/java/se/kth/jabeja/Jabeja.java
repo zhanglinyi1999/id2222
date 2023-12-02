@@ -67,17 +67,26 @@ public class Jabeja {
     if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.LOCAL) {
       // swap with random neighbors
-      // TODO
+      // TODO done
+      partner=findPartner(nodeId,getNeighbors(nodep));
+
     }
 
-    if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
-            || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM) {
+    if (partner==null&&(config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
+            || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM)) {
       // if local policy fails then randomly sample the entire graph
-      // TODO
+      // TODO done
+      partner=findPartner(nodeId,getSample(nodeId));
     }
 
     // swap the colors
-    // TODO
+    // TODO done
+    if(partner!=null){
+      int c1=nodep.getColor();
+      nodep.setColor(partner.getColor());
+      partner.setColor(c1);
+    }
+    saCoolDown();
   }
 
   public Node findPartner(int nodeId, Integer[] nodes){
@@ -87,7 +96,20 @@ public class Jabeja {
     Node bestPartner = null;
     double highestBenefit = 0;
 
-    // TODO
+    // TODO done
+    for(Integer node:nodes){
+      int d_pp=getDegree(nodep,nodep.getColor());
+      Node q=entireGraph.get(node);
+      int d_qq=getDegree(q,q.getColor());
+      int oldV=(int)Math.pow(d_pp,config.getAlpha())+(int)Math.pow(d_qq,config.getAlpha());
+      int d_pq=getDegree(nodep,q.getColor());
+      int d_qp=getDegree(q,nodep.getColor());
+      int newV=(int)Math.pow(d_pq,config.getAlpha())+(int)Math.pow(d_qp,config.getAlpha());
+      if(newV*T>oldV&&newV>highestBenefit){
+        highestBenefit=newV;
+        bestPartner=q;
+      }
+    }
 
     return bestPartner;
   }
