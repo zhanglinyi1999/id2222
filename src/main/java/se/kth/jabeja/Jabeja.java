@@ -82,7 +82,6 @@ public class Jabeja {
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM)) {
       // if local policy fails then randomly sample the entire graph
       // TODO done
-
       partner=findPartner(nodeId,getSample(nodeId));
     }
 
