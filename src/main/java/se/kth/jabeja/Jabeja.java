@@ -17,7 +17,8 @@ public class Jabeja {
   private final List<Integer> nodeIds;
   private int numberOfSwaps;
   private int round;
-  private float T;
+  private double T;
+
   private boolean resultFileCreated = false;
 
   //-------------------------------------------------------------------
@@ -27,7 +28,8 @@ public class Jabeja {
     this.round = 0;
     this.numberOfSwaps = 0;
     this.config = config;
-    this.T = config.getTemperature();
+//    this.T = config.getTemperature();
+    this.T=1.0;
   }
 
 
@@ -50,10 +52,14 @@ public class Jabeja {
    */
   private void saCoolDown(){
     // TODO for second task
-    if (T > 1)
-      T -= config.getDelta();
-    if (T < 1)
-      T = 1;
+//    if (T > 1)
+//      T -= config.getDelta();
+//    if (T < 1)
+//      T = 1;
+    T=T*0.8;
+    if(T<0.00001){
+      T=0.00001;
+    }
   }
 
   /**
@@ -85,6 +91,7 @@ public class Jabeja {
       int c1=nodep.getColor();
       nodep.setColor(partner.getColor());
       partner.setColor(c1);
+      numberOfSwaps++;
     }
     saCoolDown();
   }
@@ -105,7 +112,7 @@ public class Jabeja {
       int d_pq=getDegree(nodep,q.getColor());
       int d_qp=getDegree(q,nodep.getColor());
       int newV=(int)Math.pow(d_pq,config.getAlpha())+(int)Math.pow(d_qp,config.getAlpha());
-      if(newV*T>oldV&&newV>highestBenefit){
+      if((acc_prob(oldV,newV,T)>Math.random()&&newV<oldV)||(newV>oldV&&newV>highestBenefit)){
         highestBenefit=newV;
         bestPartner=q;
       }
@@ -114,6 +121,9 @@ public class Jabeja {
     return bestPartner;
   }
 
+  private double acc_prob(int oldV,int newV,double T){
+    return Math.exp((newV-oldV)/T);
+  }
   /**
    * The the degreee on the node based on color
    * @param node
